@@ -9,6 +9,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteract
   zip \
   jq \
   ca-certificates \
+  upx-ucl \
+  gcc-arm-linux-gnueabihf \
+  g++-arm-linux-gnueabihf \
+  gcc-aarch64-linux-gnu \
+  g++-aarch64-linux-gnu \
   && rm -rf /var/lib/apt/lists/*
 
 # github-assets-uploader to provide robust github assets upload

@@ -28,7 +28,7 @@ fi
 
 # execute pre-command if exist, e.g. `go get -v ./...`
 if [ ! -z "${INPUT_PRE_COMMAND}" ]; then
-    ${INPUT_PRE_COMMAND}
+    /bin/sh -c "${INPUT_PRE_COMMAND}"
 fi
 
 # binary suffix
@@ -37,7 +37,7 @@ if [ ${INPUT_GOOS} == 'windows' ]; then
   EXT='.exe'
 fi
 
-# prefix for ldflags 
+# prefix for ldflags
 LDFLAGS_PREFIX=''
 if [ ! -z "${INPUT_LDFLAGS}" ]; then
     LDFLAGS_PREFIX="-ldflags"
@@ -47,7 +47,10 @@ fi
 cd ${INPUT_PROJECT_PATH}
 BUILD_ARTIFACTS_FOLDER=build-artifacts-$(date +%s)
 mkdir -p ${BUILD_ARTIFACTS_FOLDER}
-GOOS=${INPUT_GOOS} GOARCH=${INPUT_GOARCH} ${INPUT_BUILD_COMMAND} -o ${BUILD_ARTIFACTS_FOLDER}/${BINARY_NAME}${EXT} ${INPUT_BUILD_FLAGS} ${LDFLAGS_PREFIX} "${INPUT_LDFLAGS}" 
+/bin/sh -c "GOOS=${INPUT_GOOS} GOARCH=${INPUT_GOARCH} ${INPUT_BUILD_COMMAND} -o ${BUILD_ARTIFACTS_FOLDER}/${BINARY_NAME}${EXT} ${INPUT_BUILD_FLAGS} ${LDFLAGS_PREFIX} \"${INPUT_LDFLAGS}\""
+if [ ${INPUT_UPX^^} == 'TRUE' ]; then
+    upx ${BUILD_ARTIFACTS_FOLDER}/${BINARY_NAME}${EXT}
+fi
 
 # prepare extra files
 if [ ! -z "${INPUT_EXTRA_FILES}" ]; then
@@ -72,7 +75,7 @@ fi
 MD5_SUM=$(md5sum ${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} | cut -d ' ' -f 1)
 SHA256_SUM=$(sha256sum ${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} | cut -d ' ' -f 1)
 
-# prefix upload extra params 
+# prefix upload extra params
 GITHUB_ASSETS_UPLOADR_EXTRA_OPTIONS=''
 if [ ${INPUT_OVERWRITE^^} == 'TRUE' ]; then
     GITHUB_ASSETS_UPLOADR_EXTRA_OPTIONS="-overwrite"
